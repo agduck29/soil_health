@@ -1,0 +1,69 @@
+﻿Variable,Laboratory,Units,Glossary
+Sample.Date,N/A,N/A,"Order, Season, and Year samples were taken"
+Sample.Loc,N/A,N/A,Location sample was taken
+CO2.Day,Haney,ppm,"Amount of CO2-C released in 24 hours from soil microbes after soil has been dried and rewetted. Measure of the microbial activity in the soil and the higher the number, the more fertile the soil."
+C.Org,Haney,ppm,Water extractable organic C (WEOC). Amount of organic C extracted with water. This pool of carbon is roughly 80 times smaller than the total soil organic C pool (% Organic Matter) and reflects the energy source driving soil microbes. 
+C.N,Haney,ppm,"Ratio of organic C from the water extract to the amount of organic N in the water extract (WEOC: WEON). The C:N ratio is a critical driving factor in the nutrient cycle. Soil organic C and N are highly related to each other as well as the water extractable organic C and N. We assess the organic C: N ratio of the water extract since this relationship reflects the portion of C and N that are readily available to soil microbes and is a more sensitive indicator of soil health than the total soil C: N ratio. A soil C: N ratio above 20:1 generally indicates that no net N and P mineralization will occur, meaning the N and P are “tied up” within the microbial cell until the ratio drops below 20:1, as the ratio decreases the more N and P are released to the soil solution which can be taken up by growing plants."
+N.Haney,Haney,ppm,N from water extractable NH4-N + 70% NO3-N + MAC*WEON*4 where; MAC = microbially active C and WEON = water extractable organic N. Constant 4 is a conservative estimate of significant rainfall events over 1 inch during the growing season.
+NO3.70,Haney,ppm,Nitrate-Nitrogen testing performed by most labs.
+N.Add,Haney,ppm,Additional Nitrogen found from incorporating the biological and NH4-N components.
+N.Tot,Haney,ppm,Total water extractable N (Inorganic + Organic).
+N.Inorg,Haney,ppm,Water extracted NO3-N + NH4-H.
+N.Org,Haney,ppm,Water extractable organic N (WEON). Amount of water extractable N minus inorganic N (NH4-N + NO3-N).
+N.Org.Rel,Haney,ppm,"Portion of the water extractable organic N credited as plant available based on the microbial activity, WEOC, WEON and the balance of the two (C:N)."
+N.Org.Res,Haney,ppm,Amount of organic N not credited as plant available usually due to lower microbial activity relative to the WEOC and WEON pools. If this number is 0 then the entire WEON pool is considered plant available.
+P.Haney,Haney,ppm,P from H3A extractable ortho-phosphate and organic P based on microbial respiration and a sliding C:N ratio.
+P.Tot,Haney,ppm,Total P from ICP H3A analysis.
+P.Inorg,Haney,ppm,Inorganic P is with H3A and analyzed for orthophosphate.
+P.Org,Haney,ppm,Total P minus Inorganic P
+P.Org.Rel,Haney,ppm,Portion of H3 extracted organic P credited as plant available based on the microbial activity.
+P.Org.Res,Haney,ppm,Amount of organic P not credited as plant available usually due to lower microbial activity. If this number is 0 then the entire pool is considered plant available.
+P.Sat.Per,Haney,%,P/(Al + Fe) Index below 5 is lacking P and above 20 is excess P
+K.Haney,Haney,ppm,H3A extractable K.
+Al.H,Haney,ppm,Aluminum by H3A extraction.
+Ca.H,Haney,ppm,Calcium by H3A extraction.
+Fe.H,Haney,ppm,Iron by H3A extraction.
+Ca.AlFe,Haney,ratio,Ca/(Al + Fe) Ratio below 1 correlates to low pH and above 20 indicates high pH.
+S.H.C.,Haney,Index,"Calculated as 1-day CO2/10 + (WEOC/100) + (WEON/10). Represents the overall health of the soil system. Numbers below 7 are considered good, but range from 0 to 50."
+pH,SFA,N/A,Measure of acidity or basicity of the soil.
+NO3,SFA,ppm,"Nitrate is the inorganic form of Nitrogen occurring in soils. Needed for protein/amino acids, chlorophyll, and cell formation."
+P,SFA,ppm,"Needed for cell formation, protein syntheses, fat and carbohydrate metabolism"
+K,SFA,ppm,Needed for water regulation and enzyme activity.
+Ca,SFA,ppm,Root permeability and enzyme activity
+Mg,SFA,ppm,Magnesium
+S,SFA,ppm,Sulfur
+Fe,SFA,ppm,Iron
+Mn,SFA,ppm,Manganese
+Zn,SFA,ppm,Zinc
+Cu,SFA,ppm,Copper
+Na,SFA,ppm,Sodium
+EC,SFA,uS/cm,Electric Conductivity
+Div.Ind,Ward,Index,Functional Group Diversity Index
+Bio.Tot,Ward,ng/g,"Total Living Microbial Biomass, Phospholipid Fatty Acid (PLFA) ng/g"
+Bac.Tot,Ward,ng/g,Total Bacteria
+Grm.P.Bio,Ward,ng/g,Gram (+) Biomass
+Act.Bio,Ward,ng/g,Actinomycetes Biomass
+Grm.N.Bio,Ward,ng/g,Gram (-) Biomass
+Rhi.Bio,Ward,ng/g,Rhizobia Biomass
+Fun.Tot.Bio,Ward,ng/g,Total Fungi Biomass
+Arb.Myc.Bio,Ward,ng/g,Arbuscular Mycorrihizal Biomass
+Sap.Bio,Ward,ng/g,Saprophytes Biomass
+Pro.Bio,Ward,ng/g,Protozoa Biomass
+Undif.Bio,Ward,ng/g,Undifferentiated Biomass
+Bac.Per,Ward,%,% of Total Biomass
+Grm.P.Per,Ward,%,% of Total Biomass
+Act.Per,Ward,%,% of Total Biomass
+Grm.N.Per,Ward,%,% of Total Biomass
+Rhi.Per,Ward,%,% of Total Biomass
+Fun.Tot.Per,Ward,%,% of Total Biomass
+Arb.Myc.Per,Ward,%,% of Total Biomass
+Sap.Per,Ward,%,% of Total Biomass
+Pro.Per,Ward,%,% of Total Biomass
+Undif.Per,Ward,%,% of Total Biomass
+Fun.Bac,Ward,ratio,"Fungi to Bacteria - Bacteria tend to dominate in systems with fewer organic inputs or residues possibly leading to a lower C:N ratio. In addition, bacteria can be more prominent in the early spring or late fall as soil temperatures are usually cooler and vegetation is less active or absent. Dry conditions, slightly alkaline to alkaline pH values, or increased land disturbance through prolonged and extensive tillage, grazing, or compaction may also favor bacteria. While bacteria are important and needed in the soil ecosystem, fungi are desired and more often considered indicators of good soil health. Increased use of cover crops and/or other organic inputs and less soil disturbance should help the soil support more fungi. Adjustments to pH may also be recommended in some more extreme circumstances."
+Pred.Prey,Ward,ratio,"Predator to Prey - This ratio is also expressed as protozoa to bacteria. Protozoa feed on bacteria which helps release nutrients, especially nitrogen. A higher ratio indicates an active community where base level nutrients are sufficient to support higher trophic levels or predators. However, this ratio will always be a relatively low number because the prey will greatly outnumber the predators."
+Grm.P.Grm.N,Ward,ratio,"Ratio of Gram (+) to Gram (-). Gram (+) bacteria typically dominate early in the growing season and/or following a fallow period. They also survive better under certain environmental conditions or stressors such as drought or extreme temperatures due to their ability to form spores. Therefore, it is common to see higher values when the community is coming out of dormancy or is stressed. These values will typically begin to approach those of a more balanced bacterial community as the soil conditions become more favorable throughout the growing season. A gram (-) dominated soil may be due to anaerobic conditions or other stressors such as pesticide application or heavy metal contamination."
+Sat.Unsat,Ward,ratio,"Saturated to Unsaturated - Bacteria alter their membranes under various environmental conditions in order to maintain optimal fluidity for nutrient and waste transport into and out of the cell. Saturated fatty acids may reflect a better adapted community to current environmental conditions. Communities under stressed conditions will increase their proportion of unsaturated fatty acids. This will likely occur most often as a result of low soil moisture or drastic changes in temperature. In general, a higher number indicates a healthier and more stable community."
+Mono.Poly,Ward,ratio,"The ratio of monounsaturated to polyunsaturated fatty acids is used along with the sat:unsat ratio to further indicate the degree of community stress. A higher ratio indicates less stress, while a lower ratio would depict higher levels of prolonged stress due to conditions such as temperature, moisture, pH, or nutrient availability (starvation)."
+Pre.16,Ward,ratio,"Pre 16:1ω7c:cy17:0 - Cyclo (cy) fatty acids are more prominent during stationary phases of growth or under high stress conditions that influence membrane fluidity and growth rates such as temperature, pH, moisture, and nutrient availability. In general, a higher number or all Pre16 is better and indicates an actively growing community experiencing fewer stressors. These values are typically higher early in the growing season (planting) when the community is becoming active and experiencing fast growth. The values may begin to drop towards the end of the growing season (harvest) following a decrease in plant growth activity or as the community approaches a stationary growth phase as the temperature/moisture changes between the seasons."
+Pre.18,Ward,ratio,"Pre 18:1ω7c:cy19:0 - Cyclo (cy) fatty acids are more prominent during stationary phases of growth or under high stress conditions that influence membrane fluidity and growth rates such as temperature, pH, moisture, and nutrient availability. In general, a higher number or all Pre18 is better and indicates an actively growing community experiencing fewer stressors. These values are typically higher early in the growing season (planting) when the community is becoming active and experiencing fast growth. The values may begin to drop towards the end of the growing season (harvest) following a decrease in plant growth activity or as the community approaches a stationary growth phase as the temperature/moisture changes between the seasons."
