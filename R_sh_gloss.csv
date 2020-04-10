@@ -8,7 +8,7 @@ N.Haney,Haney,ppm,N from water extractable NH4-N + 70% NO3-N + MAC*WEON*4 where;
 NO3.70,Haney,ppm,Nitrate-Nitrogen testing performed by most labs.
 N.Add,Haney,ppm,Additional Nitrogen found from incorporating the biological and NH4-N components.
 N.Tot,Haney,ppm,Total water extractable N (Inorganic + Organic).
-N.Inorg,Haney,ppm,Water extracted NO3-N + NH4-H.
+N.Inorg,Haney,ppm,Water extracted NO3-N + NH4-H
 N.Org,Haney,ppm,Water extractable organic N (WEON). Amount of water extractable N minus inorganic N (NH4-N + NO3-N).
 N.Org.Rel,Haney,ppm,"Portion of the water extractable organic N credited as plant available based on the microbial activity, WEOC, WEON and the balance of the two (C:N)."
 N.Org.Res,Haney,ppm,Amount of organic N not credited as plant available usually due to lower microbial activity relative to the WEOC and WEON pools. If this number is 0 then the entire WEON pool is considered plant available.
@@ -24,23 +24,23 @@ Al.H,Haney,ppm,Aluminum by H3A extraction.
 Ca.H,Haney,ppm,Calcium by H3A extraction.
 Fe.H,Haney,ppm,Iron by H3A extraction.
 Ca.AlFe,Haney,ratio,Ca/(Al + Fe) Ratio below 1 correlates to low pH and above 20 indicates high pH.
-S.H.C.,Haney,Index,"Calculated as 1-day CO2/10 + (WEOC/100) + (WEON/10). Represents the overall health of the soil system. Numbers below 7 are considered good, but range from 0 to 50."
+S.H.C.,Haney,Index,Calculated as 1-day CO2/10 + (WEOC/100) + (WEON/10). Represents the overall health of the soil system. Higher numbers are better with overall range from 0 to 50.
 pH,SFA,N/A,Measure of acidity or basicity of the soil.
 NO3,SFA,ppm,"Nitrate is the inorganic form of Nitrogen occurring in soils. Needed for protein/amino acids, chlorophyll, and cell formation."
-P,SFA,ppm,"Needed for cell formation, protein syntheses, fat and carbohydrate metabolism"
+P,SFA,ppm,"Needed for cell formation, protein syntheses, fat and carbohydrate metabolism."
 K,SFA,ppm,Needed for water regulation and enzyme activity.
-Ca,SFA,ppm,Root permeability and enzyme activity
-Mg,SFA,ppm,Magnesium
-S,SFA,ppm,Sulfur
-Fe,SFA,ppm,Iron
-Mn,SFA,ppm,Manganese
-Zn,SFA,ppm,Zinc
-Cu,SFA,ppm,Copper
-Na,SFA,ppm,Sodium
-EC,SFA,uS/cm,Electric Conductivity
+Ca,SFA,ppm,"Root permeability and enzyme activity, provides stability for cell walls, helps metabolize other nutrient uptake."
+Mg,SFA,ppm,"Cell membrane stabilization, chlorophyll componet necessary for photosynthesis."
+S,SFA,ppm,"Essential for protein development, oil production, and chlorophyll formation."
+Fe,SFA,ppm,"Prevents chlorosis, assists chlorophyll production, component of plant respiration system."
+Mn,SFA,ppm,"Helps form chloroplasts for chlorophyll production, synthesizes fatty acids, promote nitrogen absorption."
+Zn,SFA,ppm,"Needed for growth hormone production, elongation of internodes, chlorphyll formation."
+Cu,SFA,ppm,"Assists respiration and photosythesis, facilitates metabolism of carbohydrates and proteins."
+Na,SFA,ppm,"Not essential element, can aid in metabolism and chlorophyll synthesis; too much prohibits  cell development and inhibits water retention."
+EC,SFA,uS/cm,Measure of dissolved salts in water and soil.
 Div.Ind,Ward,Index,Functional Group Diversity Index
 Bio.Tot,Ward,ng/g,"Total Living Microbial Biomass, Phospholipid Fatty Acid (PLFA) ng/g"
-Bac.Tot,Ward,ng/g,Total Bacteria
+Bac.Tot.Bio,Ward,ng/g,Total Bacteria
 Grm.P.Bio,Ward,ng/g,Gram (+) Biomass
 Act.Bio,Ward,ng/g,Actinomycetes Biomass
 Grm.N.Bio,Ward,ng/g,Gram (-) Biomass
@@ -50,7 +50,7 @@ Arb.Myc.Bio,Ward,ng/g,Arbuscular Mycorrihizal Biomass
 Sap.Bio,Ward,ng/g,Saprophytes Biomass
 Pro.Bio,Ward,ng/g,Protozoa Biomass
 Undif.Bio,Ward,ng/g,Undifferentiated Biomass
-Bac.Per,Ward,%,% of Total Biomass
+Bac.Tot.Per,Ward,%,% of Total Biomass
 Grm.P.Per,Ward,%,% of Total Biomass
 Act.Per,Ward,%,% of Total Biomass
 Grm.N.Per,Ward,%,% of Total Biomass

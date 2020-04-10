@@ -1,0 +1,444 @@
+---
+title: "Soil Health Discussion"
+author: "Tyson Hart"
+date: "4/10/2020"
+output: 
+  html_document:
+    theme: null
+    highlight: null
+    mathjax: null
+---
+
+```{r, include = FALSE}
+#loads Soil_Health data
+library(corrplot)
+library(DT)
+library(ggfortify)
+library(ggplot2)
+library(tidyverse)
+
+#setwd when testing, remove when using "Run App"
+setwd("C:/Student5/Shiny/soil_health")
+
+#All data from samplings
+Soil_Health <- read.csv("R_Soil_Health.csv")
+#Glossary for data metrics
+sh_gloss <- read.csv("R_sh_gloss.csv")
+colnames(sh_gloss)[1] <- "Variable"
+#change values from factors to charactars
+sh_gloss[] <- lapply(sh_gloss, as.character)
+
+#manipulate data for shortened display
+colnames(Soil_Health)[1] <- "Sample.Date"
+Soil_Health <- Soil_Health %>% 
+  dplyr::rename(X.ID1 = ID1, #REMOVE 2
+                Sample.Loc = ID2,
+                N.Haney = N.lbs.per.acre,
+                P.Haney = P2O5.lbs.per.acre,
+                K.Haney = K2O.lbs.per.acre,
+                X.Nut.Val = Nutrient.value.per.acre.., #REMOVE 7
+                NO3.70 = NO3.N.Only.lbs.per.acre.70.,
+                N.Add = Additional.N.lbs.per.acre,
+                x.N.Save = X..nitrogen.saved..per.acre, #REMOVE 10
+                CO2.Day = X1.day.CO2.C,
+                C.Org = Organic.C,
+                N.Org = Organic.N,
+                C.N = Organic.C.N,
+                S.H.C. = Soil.Health.Calculation,
+                X.Cov.Crop = Cover.crop.mix, #REMOVE 16
+                N.Tot = Total.Nitrogen.lbs.acre,
+                N.Inorg = Inorganic.N,
+                X.N.Org2 = Organic.N.1, #REMOVE DUPLICATE 19
+                P.Tot = Total.Phosphate..lbs.acre,
+                P.Inorg = Inorganic.P,
+                P.Org = Organic.P,
+                Al.H = Al.ppm,
+                Fe.H = Fe.ppm,
+                Ca.H = Ca.ppm,
+                N.Org.Rel = Organic.N.release,
+                N.Org.Res = Organic.N.reserve,
+                P.Org.Rel = Organic.P.release,
+                P.Org.Res = Organic.P.reserve,
+                P.Sat.Per = X..P.sat,
+                #Ca.AlFe
+                X.SHC2 = SHC, #REMOVE DUPLICATE 32
+                X.N.Sav2 = Nitrogen.Saved.., #REMOVE DUPLICATE 33
+                #pH
+                X.buffer.pH = buffer.pH, #REMOVE 35
+                X.Lime = Lime, #REMOVE 36
+                #NO3
+                #Fe
+                #Mn
+                #Zn
+                #Cu
+                #P
+                #K
+                #Ca
+                #Mg
+                #S
+                #Na
+                #EC
+                Bio.Tot = Total.Biomass,
+                Div.Ind = Diversity.Index,
+                Bac.Tot.Per = Bacteria..,
+                Bac.Tot.Bio = Total.Bacteria.Biomass,
+                Act.Per = Actinomycetes..,
+                Act.Bio = Actinomycetes.Biomass,
+                Grm.N.Per = Gram......,
+                Grm.N.Bio = Gram.....Biomass,
+                Rhi.Per = Rhizobia..,
+                Rhi.Bio = Rhizobia.Biomass,
+                Fun.Tot.Per = Total.Fungi..,
+                Fun.Tot.Bio = Total.Fungi.Biomass,
+                Arb.Myc.Per = Arbusular.Mycorrhizal..,
+                Arb.Myc.Bio = Arbuscular.Mycorrhizal.Biomass,
+                Sap.Per = Saprophytic..,
+                Sap.Bio = Saprophytes.Biomass,
+                Pro.Per = Protozoan..,
+                Pro.Bio = Protozoa.Biomass,
+                Grm.P.Bio = Gram.....Biomass.1,
+                Grm.P.Per = Gram.......1,
+                Undif.Per = Undifferentiated..,
+                Undif.Bio = Undifferentiated.Biomass,
+                Fun.Bac = Fungi.Bacteria,
+                Pred.Prey = Predator.Prey,
+                Grm.P.Grm.N = Gram....Gram...,
+                #Sat.Unsat
+                #Mono.Poly
+                Pre.16 = Pre.16.1w7c.cy17.0,
+                Pre.18 = Pre.18.1w7c.cy19.0
+  )
+
+#remove duplicate and unwanted columns
+Soil_Health <- select(Soil_Health, -2, -7, -10, -16, -19, -32, -33, -35, -36)
+
+#change column order
+Soil_Health <- Soil_Health[ , c(
+  "Sample.Date",
+  "Sample.Loc",
+  "CO2.Day",
+  "C.Org",
+  "C.N",
+  "N.Haney",
+  "NO3.70",
+  "N.Add",
+  "N.Tot",
+  "N.Inorg",
+  "N.Org",
+  "N.Org.Rel",
+  "N.Org.Res",
+  "P.Haney",
+  "P.Tot",
+  "P.Inorg",
+  "P.Org",
+  "P.Org.Rel",
+  "P.Org.Res",
+  "P.Sat.Per",
+  "K.Haney",
+  "Al.H",
+  "Ca.H",
+  "Fe.H",
+  "Ca.AlFe",
+  "S.H.C.",
+  "pH",
+  "NO3",
+  "P",
+  "K",
+  "Ca",
+  "Mg",
+  "S",
+  "Fe",
+  "Mn",
+  "Zn",
+  "Cu",
+  "Na",
+  "EC",
+  "Div.Ind",
+  "Bio.Tot",
+  "Bac.Tot.Bio",
+  "Grm.P.Bio",
+  "Act.Bio",
+  "Grm.N.Bio",
+  "Rhi.Bio",
+  "Fun.Tot.Bio",
+  "Arb.Myc.Bio",
+  "Sap.Bio",  
+  "Pro.Bio",
+  "Undif.Bio",
+  "Bac.Tot.Per",
+  "Grm.P.Per",
+  "Act.Per",
+  "Grm.N.Per",
+  "Rhi.Per",
+  "Fun.Tot.Per",
+  "Arb.Myc.Per",
+  "Sap.Per",
+  "Pro.Per",
+  "Undif.Per",
+  "Fun.Bac",
+  "Pred.Prey",
+  "Grm.P.Grm.N",
+  "Sat.Unsat",
+  "Mono.Poly",
+  "Pre.16",
+  "Pre.18"  
+)
+]
+
+#convert lbs/ac to ppm (lbs/ac divided by 2 = ppm)
+Soil_Health$N.Haney <- Soil_Health$N.Haney / 2
+Soil_Health$P.Haney <- Soil_Health$P.Haney / 2
+Soil_Health$K.Haney <- Soil_Health$K.Haney / 2
+Soil_Health$NO3.70 <- Soil_Health$NO3.70 / 2
+Soil_Health$N.Add <- Soil_Health$N.Add / 2
+Soil_Health$N.Tot <- Soil_Health$N.Tot / 2
+Soil_Health$N.Inorg <- Soil_Health$N.Inorg / 2
+Soil_Health$P.Tot <- Soil_Health$P.Tot / 2
+Soil_Health$P.Inorg <- Soil_Health$P.Inorg / 2
+Soil_Health$P.Org <- Soil_Health$P.Org / 2
+Soil_Health$N.Org.Rel <- Soil_Health$N.Org.Rel / 2
+Soil_Health$N.Org.Res <- Soil_Health$N.Org.Res / 2
+Soil_Health$P.Org.Rel <- Soil_Health$P.Org.Rel / 2
+Soil_Health$P.Org.Res <- Soil_Health$P.Org.Res / 2
+
+#change data format from factor
+Soil_Health$NO3 <- as.numeric(Soil_Health$NO3)
+
+#factors in Fun.Bac, Pred.Prey, Mono.Poly, Pre.16, Pre.18
+#replace Div/0 errors to min (0) or max of variable
+Soil_Health$Fun.Bac <- as.character(Soil_Health$Fun.Bac)
+Soil_Health$Fun.Bac[Soil_Health$Fun.Bac == "ALL BACTERIA"] <- "0"
+Soil_Health$Fun.Bac <- as.numeric(Soil_Health$Fun.Bac)
+
+Soil_Health$Pred.Prey <- as.character(Soil_Health$Pred.Prey)
+Soil_Health$Pred.Prey[Soil_Health$Pred.Prey == "ALL PREY"] <- "0"
+Soil_Health$Pred.Prey <- as.numeric(Soil_Health$Pred.Prey)
+
+Soil_Health$Mono.Poly <- as.character(Soil_Health$Mono.Poly)
+Soil_Health$Mono.Poly[Soil_Health$Mono.Poly == "ALL MONO"] <- "230"
+Soil_Health$Mono.Poly <- as.numeric(Soil_Health$Mono.Poly)
+
+Soil_Health$Pre.16 <- as.character(Soil_Health$Pre.16)
+Soil_Health$Pre.16[Soil_Health$Pre.16 == "NONE FOUND"] <- "0"
+Soil_Health$Pre.16[Soil_Health$Pre.16 == "ALL PRE 16:1"] <- "20"
+Soil_Health$Pre.16 <- as.numeric(Soil_Health$Pre.16)
+
+Soil_Health$Pre.18 <- as.character(Soil_Health$Pre.18)
+Soil_Health$Pre.18[Soil_Health$Pre.18 == "ALL CYCLO 19:0"] <- "0"
+Soil_Health$Pre.18[Soil_Health$Pre.18 == "ALL PRE 18:1"] <- "65"
+Soil_Health$Pre.18 <- as.numeric(Soil_Health$Pre.18)
+
+#only numeric data
+sh_numeric <- select(Soil_Health, -1, -2)
+sh_choice <- names(sh_numeric)
+
+```
+
+## Introduction
+Of all the statistical methods, selecting through the metrics in the boxplots provides the quickest and most relatable way of visualizing the data. The boxplots show clear significant differences when the body of one boxplot is completely above or below another. Haney’s Soil Health Calculation (S.H.C.), SFA's pH, Calcium (Ca), and Manganese (Mn), Ward's diversity index (Div.Ind), total micorobial biomass (Bio.Tot), and an all-varialbe principal components analysis (PCA) show useful results.
+
+```{r, echo = FALSE}
+ggplot(Soil_Health, 
+      aes(x = Sample.Loc, 
+          y = S.H.C.,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Soil Health Calculation") +
+      labs(fill = "Legend") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+
+```
+
+### Soil Health Calculation
+Haney’s Soil Health Calculation takes into account three weighted variables, the carbon dioxide released from the microbes in 24 hours after drying and rewetting, organic carbon, and organic nitrogen. The results show a clear separation in the Overgrown site and followed closely by the Bottom site. These two locations have been undisturbed for decades and clearly have the most developed microbial communities. Organic matter is constantly built up in the Overgrown site by allowing for continuous growth in a diverse natural state.  The Bottom site is the lowest on the landscape, prone to flooding, and is a carbon and nitrogen sink. The microbes that populate the soil must be adapted to ever-changing conditions, but their nutrient availability is constant. The Burned, Longleaf, and Pasture sites represent a median area, while the Crop, Loblolly, and Switch site have the lowest values.
+
+### pH
+
+  | Location |pH Med|pH Min|pH Max|pH SdDv|
+  |----------|------|------|------|-------|
+  | Bottom   | 4.94 | 4.60 | 5.53 | 0.29  |
+  | Burned   | 5.83 | 5.60 | 6.31 | 0.21  | 
+  | Crop     | 5.71 | 5.24 | 6.16 | 0.27  | 
+  | Loblolly | 5.58 | 4.75 | 5.74 | 0.35  | 
+  | Longleaf | 5.35 | 4.49 | 6.22 | 0.59  | 
+  | Overgrown| 7.24 | 6.73 | 7.62 | 0.28  | 
+  | Pasture  | 6.83 | 6.41 | 7.42 | 0.32  |
+  | Swith    | 5.73 | 5.28 | 5.99 | 0.25  | 
+
+Soil pH affects the ability for plants to absorb nutrients. Soils in east Texas are generally acidic due to high amounts of rainfall. The pH range for all sampled sites across all seasons was 4.49 to 7.62. The Bottom had the lowest median pH of 4.94. The Longleaf, Loblolly, Crop, Switch, and Burned site had median pH values between 5.35 and 5.83. The Pasture had a median value of 6.83 and the Overgrown site had the highest pH of 7.24.
+
+#### Nutrient Availabilty by pH
+
+![](www/nutrient_pH.png)
+
+### Calcium
+
+```{r, echo = FALSE, warning=FALSE}
+ggplot(Soil_Health, 
+      aes(x = Sample.Loc, 
+          y = Ca,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Calcium") +
+      labs(fill = "Legend") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+```
+
+The values for calcium (Ca) and manganese (Mn) reflect the variability in pH. Higher values of Ca are correlated with higher pH levels. Ca is water soluble and can be transported through the profile. The Bottom has the lowest pH and Ca because of the seasonal flooding. The land manager of the Pasture takes annual soil samples and adds lime (calcium carbonate or CaCO3) when pH falls below the recommended threshold for Bermudagrass.
+
+### Manganese
+
+```{r, echo = FALSE, warning=FALSE}
+ggplot(Soil_Health, 
+      aes(x = Sample.Loc, 
+          y = Mn,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Manganese") +
+      labs(fill = "Legend") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+
+```
+
+Higher Mn levels are present in the Bottom and Crop sites. The Bottom has lowered levels because of fluctuating water subjecting the site to anaerobic conditions. The higher Mn is a reason visible concentrations (black nodules) in the soil are an indicator of hydric soils used by the Army Corps of Engineers to delineate wetlands. Even though the Crop field has well-drained soils, it is postulated heighted Mn are the result of a plowpan and cause water to perch in the upper soil horizons. Therefore causing the Crop to artificially mimic the Mn levels in the Bottom.
+
+### Diversity Index by Sampling Season
+
+```{r, echo = FALSE, message=FALSE, out.width="50%"}
+Soil_Health %>% 
+  filter(Sample.Date %in% c("2Spr18", "6Spr19")) %>% 
+  ggplot(
+      aes(x = Sample.Loc, 
+          y = Div.Ind,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Diversity Index") +
+      labs(fill = "Spring") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+
+Soil_Health %>% 
+  filter(Sample.Date %in% c("3Sum18", "7Sum19")) %>% 
+  ggplot(
+      aes(x = Sample.Loc, 
+          y = Div.Ind,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Diversity Index") +
+      labs(fill = "Summer") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+```
+
+```{r, echo = FALSE, message=FALSE, out.width="50%"}
+Soil_Health %>% 
+  filter(Sample.Date %in% c("4Fal18", "8Fal19")) %>% 
+  ggplot(
+      aes(x = Sample.Loc, 
+          y = Div.Ind,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Diversity Index") +
+      labs(fill = "Fall") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+
+Soil_Health %>% 
+  filter(Sample.Date %in% c("1Win18", "5Win19", "9Win20")) %>% 
+  ggplot(
+      aes(x = Sample.Loc, 
+          y = Div.Ind,
+          fill = Sample.Loc)) +
+      geom_boxplot() +
+      theme(axis.text.x = element_text(angle = 90)) +
+      xlab("Sampling Location") + 
+      ylab("Diversity Index") +
+      labs(fill = "Winter") +
+      theme(axis.text = element_text(size = 10),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 10),
+            axis.title = element_text(size = 10))
+
+```
+
+Ward’s Diversity Index had a definitive seasonal component. During the spring, the Bottom, Burned, Overgrown, Pasture, and Switch sites had significantly higher values than the Crop, Loblolly, and Longleaf sites. The summer sampling all had similar values except the Crop field, which was significantly lower. The fall again showed variability with three groupings; the Bottom, Longleaf, Overgrown, and Switch sites were the highest; the Burned and Loblolly occupied the middle; the Crop and Pasture sites were significantly lower. Lastly, the winter mirrored the summer with similar values except a significantly lower index in the Crop site. The variability is possibly associated with aboveground growth. Observationally, the Bottom, Burned, and Overgrown sites have the highest plant density and diversity and at least one species of plant is green (not dormant) during the seasons of sampling.
+
+### Total Microbial Biomass
+
+  | Location |Bio Med|Bio Min|Bio Max|Bio SdDv|
+  |----------|-------|-------|-------|--------|
+  | Bottom   | 5,827 | 3,713 |35,147 | 9,854  |
+  | Burned   | 3,464 | 2,302 | 4,716 | 1,036  |
+  | Crop     | 1,033 |   322 | 1,769 |   397  |
+  | Loblolly | 2,379 | 1,463 | 4,176 |   991  | 
+  | Longleaf | 3,031 | 1,366 |13,908 | 3,926  |
+  | Overgrown| 8,509 | 4,528 |10,853 | 2,186  | 
+  | Pasture  | 4,226 | 3,107 | 7,406 | 1,439  |
+  | Swith    | 2,542 | 1,220 | 5,969 | 1,685  |
+
+Ward’s measure of total microbial biomass paints a distinct picture of underground activity. The Overgrown site had the highest median total biomass of 8,509 ng/g and the Crop site had the lowest with 1,033 ng/g. The biomass totals reflect the diversity index increase with aboveground plant species. The total biomass at the Burned site was close to both the Loblolly and Longleaf sites. This is surprising because all historical accounts and current land management recommendations include a frequent fire prescription. Further reading and research needs to be conducted to learn more of the role of fire in microbial communities.
+
+## Correlation
+
+```{r, echo = FALSE, message=FALSE}
+  Soil_Health %>% 
+  select("Bio.Tot", "Div.Ind", "pH", "NO3", "P", "K", "Ca", "Mg", "S", "Fe", "Mn", "Zn", "Cu") %>%
+  na.omit() %>% 
+  cor() %>% 
+  corrplot(method = "color",
+             type = "upper",
+             order = "hclust",
+             number.cex = 0.7, 
+             addCoef.col = 2)
+```
+
+While the correlation data can be confusing, comparing the Ward’s biological results to the SFA’s abiotic micronutrient data shows there is little correlation. Comparing the Bio.Tot and Div.Ind across all other metrics shows values closer to 0, than to 1 or -1. Meaning, the sites cannot be defined solely by their nutrient densities. This is not to knock the importance of labs that run basic N, P, and K, but rather to provide perspective that low nutrients do not justify a poor soil health classification. Using biotic measurements provided by labs like Haney and Ward allow a unique look into the functioning soil matrix that are benign to standard tests.
+
+###Principal Components Analysis (PCA)
+
+```{r, echo = FALSE, message=FALSE}
+  autoplot(prcomp(na.omit(select(Soil_Health, -1,-2))),
+             data = na.omit(Soil_Health),
+             colour = "Sample.Loc",
+             size = 3,
+             frame = TRUE,
+             loadings = TRUE,
+             loadings.label = TRUE,
+             loadings.label.size = 3)
+```
+
+The most overwhelming and brain-twisting are the PCA results. But, they are useful because the user can input a mind boggling amount of multi-variate data and the algorithms try and group the data accordingly. There were 8 sites, 9 samplings with 66 metrics studied for an overall 4,752 data variables. The human mind cannot process all the potential correlatives. PCA is used to unwind the chaos. In the featured PCA, all variables were used. The discovery is PCA groups the site locations apart without any user bias. The groupings are not perfect, but a clear distinction is drawn around the Overgrown, Bottom, Pasture, and Crop sites. The frames and points are muddied between the Burned, Loblolly, Longleaf, and Switch sites. To discover the differences between the closely related sites, removal of the first four locations from analysis could tease out the intricacies between the latter four. The eigenvectors show the variables most discriminant in distancing the variables. Total Biomass and Calcium are key indicators in the point distribution. Furthering investigation by layering different variable combinations into PCA could provide what metrics are the most useful in discerning soil health in this study, and extrapolating to greater east Texas.
+
+## Conclusion
+
+This soil is good versus this soil is bad can only go so far in the justification of what is truly healthy or not. The data provided by the study begins to give a quantitative way of showcasing what conservationists have been describing qualitatively for years. Further elucidation of this data can begin to shed light on what metrics can help truly qualifying which east Texas soils are healthy. And if the site is deemed unsatisfactory by the land manager's standards, what enhancements can be made. This tool was built to quickly compare a complicated set of variables in a complex environment. By getting the ball rolling, the hope is others will take time to provide insights to their analysis. All thoughts are welcome as more perspectives allow for healthy discussion.
+
+
+

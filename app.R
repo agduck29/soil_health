@@ -1,8 +1,10 @@
-#library(shiny)
+library(shiny)
+library(shinyBS)
 library(shinydashboard)
 library(shinythemes)
 library(corrplot)
 library(DT)
+library(ggfortify)
 library(ggplot2)
 library(hashids)
 library(leaflet)
@@ -13,7 +15,7 @@ library(rsconnect)
 rsconnect::setAccountInfo(name='agduck29', token='FD9F192A4EC49AB82BA160877756E44B', secret='w7IwYf0IvQFoP2VvfrK04qQ6bzqHcORE5/oijHx5')
 
 #setwd when testing, remove when using "Run App"
-setwd("C:/Student5/Shiny/soil_health")
+#setwd("C:/Student5/Shiny/soil_health")
 
 #source for lightbox styel image gallery
 source("src/lightbox.R")
@@ -78,8 +80,8 @@ Soil_Health <- Soil_Health %>%
                 #EC
                 Bio.Tot = Total.Biomass,
                 Div.Ind = Diversity.Index,
-                Bac.Per = Bacteria..,
-                Bac.Tot = Total.Bacteria.Biomass,
+                Bac.Tot.Per = Bacteria..,
+                Bac.Tot.Bio = Total.Bacteria.Biomass,
                 Act.Per = Actinomycetes..,
                 Act.Bio = Actinomycetes.Biomass,
                 Grm.N.Per = Gram......,
@@ -153,7 +155,7 @@ Soil_Health <- Soil_Health[ , c(
   "EC",
   "Div.Ind",
   "Bio.Tot",
-  "Bac.Tot",
+  "Bac.Tot.Bio",
   "Grm.P.Bio",
   "Act.Bio",
   "Grm.N.Bio",
@@ -163,7 +165,7 @@ Soil_Health <- Soil_Health[ , c(
   "Sap.Bio",  
   "Pro.Bio",
   "Undif.Bio",
-  "Bac.Per",
+  "Bac.Tot.Per",
   "Grm.P.Per",
   "Act.Per",
   "Grm.N.Per",
@@ -199,7 +201,7 @@ Soil_Health$N.Org.Res <- Soil_Health$N.Org.Res / 2
 Soil_Health$P.Org.Rel <- Soil_Health$P.Org.Rel / 2
 Soil_Health$P.Org.Res <- Soil_Health$P.Org.Res / 2
 
-#change data format
+#change data format from factor
 Soil_Health$NO3 <- as.numeric(Soil_Health$NO3)
 
 #factors in Fun.Bac, Pred.Prey, Mono.Poly, Pre.16, Pre.18
@@ -236,30 +238,32 @@ images <<- data.frame(src = list.files('www/img')) %>%
   rowwise() %>%
   mutate(key = hashids::encode(as.integer(Img.Num), hashid_settings(salt = "this is my salt")))
 
-#map icons
-leafIcons <- icons(
-  iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
-  iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94,
-  shadowUrl = "http://leafletjs.com/examples/custom-icons/leaf-shadow.png",
-  shadowWidth = 50, shadowHeight = 64,
-  shadowAnchorX = 4, shadowAnchorY = 62
-)
-
 #user interface (ui)
 ui <- dashboardPage(
   dashboardHeader(title = "Soil Health Study"),
   dashboardSidebar(
     sidebarMenu(
+      menuItem("About", tabName = "about", icon = icon("seedling")),
       menuItem("Boxplots", tabName = "boxplots", icon = icon("poll")),
-      menuItem("Images", tabName = "gallery", icon = icon("images")),
       menuItem("Correlation", tabName = "corrplot", icon = icon("cubes")),
+      menuItem("Images", tabName = "gallery", icon = icon("images")),
       menuItem("Map", tabName = "map", icon = icon("map")),
-      menuItem("Raw Data", tabName = "raw", icon = icon("table"))
+      menuItem("PCA", tabName = "pca", icon = icon("asterisk")),
+      menuItem("Raw Data", tabName = "raw", icon = icon("table")),
+      menuItem("User Discussion", tabName = "user", icon = icon("university"),
+               menuSubItem("Hart", tabName = "hart")
+               )
     )
   ),
   dashboardBody(
     tabItems(
+      tabItem(tabName = "about",
+              fluidRow(
+                column(6,
+                       includeHTML("intro.html")
+                )
+              )
+      ),
       tabItem(tabName = "boxplots",
               fluidPage(
                 pageWithSidebar(
@@ -299,28 +303,85 @@ ui <- dashboardPage(
                 )
               )
       ),
-      tabItem(tabName = "gallery",
-              mainPanel(
-                fluidRow(
-                  column(12, uiOutput("lb"))
+      tabItem(tabName = "corrplot",
+              fluidRow(
+                column(width = 2,
+                       bsCollapse(open = "Options",
+                                  bsCollapsePanel("Haney",
+                                                  checkboxGroupInput("corrCheck1",
+                                                                     "Do not uncheck date & location",
+                                                                     choices = names(Soil_Health[1:26]),
+                                                                     selected = c("Sample.Date",
+                                                                                  "Sample.Loc"))
+                                  ),
+                                  bsCollapsePanel("SFA",
+                                                  checkboxGroupInput("corrCheck2",
+                                                                     "Variable",
+                                                                     choices = sh_choice[25:37])
+                                  ),
+                                  bsCollapsePanel("Ward",
+                                                  checkboxGroupInput("corrCheck3",
+                                                                     "Variable",
+                                                                     choices = sh_choice[38:66],
+                                                                     selected = sh_choice[38:43])
+                                  ),
+                                  bsCollapsePanel("Sampling Date & Location",
+                                                  checkboxGroupInput("corrDate",
+                                                                     "Date",
+                                                                     choices = list("2018 Winter" = "1Win18",
+                                                                                    "2018 Spring" = "2Spr18",
+                                                                                    "2018 Summer" = "3Sum18",
+                                                                                    "2018 Fall" = "4Fal18",
+                                                                                    "2019 Winter" = "5Win19",
+                                                                                    "2019 Spring" = "6Spr19",
+                                                                                    "2019 Summer" = "7Sum19",
+                                                                                    "2019 Fall" = "8Fal19",
+                                                                                    "2020 Winter" = "9Win20"),
+                                                                     selected = c("1Win18",
+                                                                                  "2Spr18",
+                                                                                  "3Sum18",
+                                                                                  "4Fal18",
+                                                                                  "5Win19",
+                                                                                  "6Spr19",
+                                                                                  "7Sum19",
+                                                                                  "8Fal19",
+                                                                                  "9Win20")
+                                                  ),
+                                                  checkboxGroupInput("corrLoc",
+                                                                     "Location",
+                                                                     choices = unique(sort(Soil_Health$Sample.Loc)),
+                                                                     selected = unique(Soil_Health$Sample.Loc))
+                                  ),
+                                  bsCollapsePanel("Options",
+                                           radioButtons("corrOrder",
+                                                        "Order",
+                                                        choices = list("Alphabetical" = "alphabet",
+                                                                       "First PC Order" = "FPC",
+                                                                       "Hierarchial" = "hclust"),
+                                                        selected = "hclust"),
+                                           radioButtons("corrMeth",
+                                                        "Method",
+                                                        choices = list("Circle" = "circle",
+                                                                       "Color" = "color",
+                                                                       "Number" = "number",
+                                                                       "Square" = "square"),
+                                                        selected = "color"),
+                                           numericInput("corrSize",
+                                                        "Text Size",
+                                                        value = 2),
+                                           sliderInput("corrColor",
+                                                       "Text Color",
+                                                       min = 0, max = 10, value = 2)
+                                  )
+                       )
+                ),
+                column(width = 10,
+                       plotOutput("corrPlot", width = "100%", height = "800px")
                 )
               )
       ),
-      tabItem(tabName = "corrplot",
-              fluidPage(
-                headerPanel("Correlation Plots"),
-                sidebarPanel(
-                  checkboxGroupInput("corrCheck",
-                                     h5(strong("Variable")),
-                                     choices = sh_choice,
-                                     selected = c("N.Haney",
-                                                  "P.Haney",
-                                                  "K.Haney")
-                  ),
-                  width = 2),
-                mainPanel(
-                  plotOutput("corrPlot", width = "100%", height = "800px")
-                )
+      tabItem(tabName = "gallery",
+              fluidRow(uiOutput("lb")
               )
       ),
       tabItem(tabName = "map",
@@ -329,10 +390,136 @@ ui <- dashboardPage(
                 leafletOutput("mapOutput", width = "100%", height = "800px")
               )
       ),
+      tabItem(tabName = "pca",
+              fluidRow(
+                column(width = 2,
+                       bsCollapse(open = "Options",
+                                  bsCollapsePanel("Haney",
+                                                  checkboxGroupInput("pcaCheck1",
+                                                                     "Do not uncheck date & location",
+                                                                     choices = names(Soil_Health[1:26]),
+                                                                     selected = c("Sample.Date",
+                                                                                  "Sample.Loc"))
+                                  ),
+                                  bsCollapsePanel("SFA",
+                                                  checkboxGroupInput("pcaCheck2",
+                                                                     "Variable",
+                                                                     choices = sh_choice[25:37])
+                                  ),
+                                  bsCollapsePanel("Ward",
+                                                  checkboxGroupInput("pcaCheck3",
+                                                                     "Variable",
+                                                                     choices = sh_choice[38:66],
+                                                                     selected = sh_choice[38:43])
+                                  ),
+                                  bsCollapsePanel("Sampling Date & Location",
+                                                  checkboxGroupInput("pcaDate",
+                                                                     "Date",
+                                                                     choices = list("2018 Winter" = "1Win18",
+                                                                                    "2018 Spring" = "2Spr18",
+                                                                                    "2018 Summer" = "3Sum18",
+                                                                                    "2018 Fall" = "4Fal18",
+                                                                                    "2019 Winter" = "5Win19",
+                                                                                    "2019 Spring" = "6Spr19",
+                                                                                    "2019 Summer" = "7Sum19",
+                                                                                    "2019 Fall" = "8Fal19",
+                                                                                    "2020 Winter" = "9Win20"),
+                                                                     selected = c("1Win18",
+                                                                                  "2Spr18",
+                                                                                  "3Sum18",
+                                                                                  "4Fal18",
+                                                                                  "5Win19",
+                                                                                  "6Spr19",
+                                                                                  "7Sum19",
+                                                                                  "8Fal19",
+                                                                                  "9Win20")
+                                                  ),
+                                                  checkboxGroupInput("pcaLoc",
+                                                                     "Location",
+                                                                     choices = unique(sort(Soil_Health$Sample.Loc)),
+                                                                     selected = unique(Soil_Health$Sample.Loc)
+                                                  )
+                                  ),
+                                  bsCollapsePanel("Options",
+                                                  radioButtons("groupby", h5(strong("Group by")),
+                                                               choices = list("Location" = "Sample.Loc",
+                                                                              "Date" = "Sample.Date")
+                                                  ),
+                                                  h5(strong("PCA Options")),
+                                                  checkboxInput("frame","Frames", value = TRUE),  
+                                                  checkboxInput("eigen","Eigenvectors", value = FALSE),
+                                                  checkboxInput("load.label","Labels", value = FALSE),
+                                                  numericInput("pcalabsize", "Label Size", value = 3),
+                                                  numericInput("pcaNum", "Point Size", value = 3)
+                                  )
+                       )
+                ),
+                column(width = 10,
+                       plotOutput("pcaPlot", width = "100%", height = "800px")
+                )
+              )
+      ),
       tabItem(tabName = "raw",
-              mainPanel(
-                fluidPage(
-                  dataTableOutput("rawtable")
+              fluidRow(
+                column(width = 2,
+                       bsCollapse(open = "Sampling Date & Location",
+                                  bsCollapsePanel("Haney",
+                                                  checkboxGroupInput("rawCheck1",
+                                                                     "Variables",
+                                                                     choices = names(Soil_Health[1:26]),
+                                                                     selected = c("Sample.Date",
+                                                                                  "Sample.Loc"))
+                                  ),
+                                  bsCollapsePanel("SFA",
+                                                  checkboxGroupInput("rawCheck2",
+                                                                     "Variable",
+                                                                     choices = sh_choice[25:37],
+                                                                     selected = sh_choice[25:37])
+                                  ),
+                                  bsCollapsePanel("Ward",
+                                                  checkboxGroupInput("rawCheck3",
+                                                                     "Variable",
+                                                                     choices = sh_choice[38:66])
+                                  ),
+                                  bsCollapsePanel("Sampling Date & Location",
+                                                  checkboxGroupInput("rawDate",
+                                                                     "Date",
+                                                                     choices = list("2018 Winter" = "1Win18",
+                                                                                    "2018 Spring" = "2Spr18",
+                                                                                    "2018 Summer" = "3Sum18",
+                                                                                    "2018 Fall" = "4Fal18",
+                                                                                    "2019 Winter" = "5Win19",
+                                                                                    "2019 Spring" = "6Spr19",
+                                                                                    "2019 Summer" = "7Sum19",
+                                                                                    "2019 Fall" = "8Fal19",
+                                                                                    "2020 Winter" = "9Win20"),
+                                                                     selected = c("1Win18",
+                                                                                  "2Spr18",
+                                                                                  "3Sum18",
+                                                                                  "4Fal18",
+                                                                                  "5Win19",
+                                                                                  "6Spr19",
+                                                                                  "7Sum19",
+                                                                                  "8Fal19",
+                                                                                  "9Win20")
+                                                  ),
+                                                  checkboxGroupInput("rawLoc",
+                                                                     "Location",
+                                                                     choices = unique(sort(Soil_Health$Sample.Loc)),
+                                                                     selected = unique(Soil_Health$Sample.Loc)
+                                                  )
+                                  )
+                       )
+                ),
+                column(width = 10,
+                       dataTableOutput("rawtable")
+                )
+              )
+      ),
+      tabItem(tabName = "hart",
+              fluidRow(
+                column(7,
+                       includeHTML("userHart.html")
                 )
               )
       )
@@ -355,28 +542,56 @@ server <- function(input, output) {
       theme(axis.text.x = element_text(angle = 90)) +
       xlab("Sampling Location") + 
       ylab(input$ycol) +
-      labs(fill = "Legend")
+      labs(fill = "Legend") +
+      theme(axis.text = element_text(size = 12),
+            legend.title = element_text(size = 14),
+            legend.text = element_text(size = 12),
+            axis.title = element_text(size = 14))
   })
   #image gallery
   output$lb <- renderUI({
     lightbox_gallery(images, "lb-gallery", display = TRUE)
   })
   #correlation matrix
-  corrData <- reactive({
-    Soil_Health %>% 
-      select(c(input$corrCheck)) %>% 
+  corrDate <- reactive({
+    Soil_Health %>%
+      dplyr::filter(Sample.Date %in% c(input$corrDate))
+  })
+  corrLoc <- reactive({
+    corrDate() %>% 
+      dplyr::filter(Sample.Loc %in% c(input$corrLoc))
+  })
+  corrSelect <- reactive({
+    corrLoc() %>% 
+      select(c(input$corrCheck1, input$corrCheck2, input$corrCheck3))
+  })
+  corrOmit <- reactive({
+    select(corrSelect(), -1, -2) %>% 
       na.omit() %>% 
       cor()
   })
   output$corrPlot <- renderPlot({
-    corrplot(corrData(), type = "upper", method = "color", order = "hclust", number.cex = 0.7, addCoef.col = 0.7)
+    corrplot(corrOmit(), 
+             method = input$corrMeth,
+             type = "upper",
+             order = input$corrOrder,
+             number.cex = input$corrSize, 
+             addCoef.col = input$corrColor)
   })
-  #DT raw data tables, still too many columns: checklist? https://shiny.rstudio.com/gallery/datatables-demo.html
+  #DT raw data tables
+  rawFilter <- reactive({
+    Soil_Health %>% 
+      dplyr::filter(Sample.Date %in% c(input$rawDate)) %>% 
+      dplyr::filter(Sample.Loc %in% c(input$rawLoc))
+  })
+  rawSelect <- reactive({
+    rawFilter() %>% 
+      select(c(input$rawCheck1, input$rawCheck2, input$rawCheck3))
+  })
   output$rawtable <- renderDataTable({
-    datatable(Soil_Health, rownames = FALSE, options = list(lengthMenu = FALSE, pageLength = 20)) %>% 
+    datatable(rawSelect(), rownames = FALSE, options = list(lengthMenu = FALSE, pageLength = 20)) %>% 
       formatRound(c(3:68), 2)
   })
-  str(Soil_Health)
   #definition under boxplot variables
   filterUnit <- reactive({
     sh_gloss %>% dplyr::filter(sh_gloss$Variable == input$ycol)
@@ -404,6 +619,31 @@ server <- function(input, output) {
   })
   output$defineOutput <- renderText({
     paste(selectDef())
+  })
+  #pca
+  pcaDate <- reactive({
+    Soil_Health %>% 
+      dplyr::filter(Sample.Date %in% c(input$pcaDate))
+  })
+  pcaLoc <- reactive({
+    pcaDate() %>% 
+      dplyr::filter(Sample.Loc %in% c(input$pcaLoc))
+  })
+  pcaSelect <- reactive({
+    pcaLoc() %>%
+      select(c(input$pcaCheck1, input$pcaCheck2, input$pcaCheck3)) %>% 
+      na.omit()
+  })
+  output$pcaPlot <- renderPlot({
+    autoplot(prcomp(select(pcaSelect(), -1,-2)),
+             data = pcaSelect(),
+             colour = input$groupby,
+             size = input$pcaNum,
+             frame = input$frame,
+             loadings = input$eigen,
+             loadings.label = input$load.label,
+             loadings.label.size = input$pcalabsize
+    )
   })
   #leaflet map
   output$mapOutput <- renderLeaflet({
@@ -435,7 +675,7 @@ server <- function(input, output) {
       addMarkers(lat = 31.5141, lng = -94.7164, 
                  popup = popupImage(img = "img/4Fal18_Switch_8.jpg", src = "local", width = "300px", height = "100%"),
                  label = "Switch") %>% 
-        addLayersControl(
+      addLayersControl(
         baseGroups = c("ESRI NatGeo", "Esri World Imagery"),
         position = c("topleft"),
         options = layersControlOptions(collapsed = FALSE)
